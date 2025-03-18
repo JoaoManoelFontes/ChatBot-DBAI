@@ -1,0 +1,20 @@
+services:
+  dbai-pg:
+    image: bitnami/postgresql:latest
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=dbai
+    volumes:
+      - ./migrations/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+
+  dbai-redis:
+    image: bitnami/redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+
+
