@@ -1,21 +1,21 @@
-import { pg } from "../db/client";
-import { generateText, tool } from "ai";
-import { openai } from "../ai/model";
-import z from "zod";
-import { getDatabaseSchema } from "../utils/get-database-schema";
+import { generateText, tool } from 'ai'
+import z from 'zod'
+import { openai } from '../ai/model'
+import { pg } from '../db/client'
+import { isSafeQuery } from '../db/verify-ai-query'
 import {
-  TOOL_DESCRIPTION_PROMPT,
   SYSTEM_PROMPT,
+  TOOL_DESCRIPTION_PROMPT,
   TOOL_PARAMETERS_DESCRIPTIONS,
-} from "../properties/dbai-properties";
-import { isSafeQuery } from "../db/verify-ai-query";
+} from '../properties/dbai-properties'
+import { getDatabaseSchema } from '../utils/get-database-schema'
 
 interface getDbaiAnswerParams {
-  question: string;
+  question: string
 }
 
 export async function getDbaiAnswer({ question }: getDbaiAnswerParams) {
-  const databaseSchema = await getDatabaseSchema();
+  const databaseSchema = await getDatabaseSchema()
 
   const answer = await generateText({
     model: openai,
@@ -32,19 +32,19 @@ export async function getDbaiAnswer({ question }: getDbaiAnswerParams) {
         }),
         execute: async ({ query, params }) => {
           if (!isSafeQuery(query)) {
-            return JSON.stringify({ error: "Unsafe query" });
+            return JSON.stringify({ error: 'Unsafe query' })
           }
           try {
-            const result = await pg.unsafe(query, params);
-            return JSON.stringify(result);
+            const result = await pg.unsafe(query, params)
+            return JSON.stringify(result)
           } catch (error) {
-            return JSON.stringify({ error: error.message });
+            return JSON.stringify({ error: error.message })
           }
         },
       }),
     },
     maxSteps: 3,
     system: SYSTEM_PROMPT(),
-  });
-  return { answer: answer.text };
+  })
+  return { answer: answer.text }
 }
