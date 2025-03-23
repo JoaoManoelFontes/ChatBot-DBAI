@@ -1,4 +1,4 @@
-import { pg } from '../db/client'
+import { pg } from '../db/pg/pg-client'
 
 export async function getDatabaseSchema() {
   // Consulta para obter informações sobre as tabelas e colunas

@@ -1,8 +1,10 @@
 import { generateText, tool } from 'ai'
 import z from 'zod'
 import { openai } from '../ai/model'
-import { pg } from '../db/client'
-import { isSafeQuery } from '../db/verify-ai-query'
+import { pg } from '../db/pg/pg-client'
+import { storeFAQ } from '../db/redis/caching-storage'
+import { findCachedFAQ } from '../db/redis/similarity-search'
+import { isSafeQuery } from '../db/utils/verify-ai-query'
 import {
   SYSTEM_PROMPT,
   TOOL_DESCRIPTION_PROMPT,
@@ -16,6 +18,7 @@ interface getDbaiAnswerParams {
 
 export async function getDbaiAnswer({ question }: getDbaiAnswerParams) {
   const databaseSchema = await getDatabaseSchema()
+  const cachedAnswer = await findCachedFAQ(question)
 
   const answer = await generateText({
     model: openai,
@@ -44,7 +47,18 @@ export async function getDbaiAnswer({ question }: getDbaiAnswerParams) {
       }),
     },
     maxSteps: 3,
-    system: SYSTEM_PROMPT(),
+    system: SYSTEM_PROMPT(cachedAnswer?.answer ?? 'No cached answer found'),
   })
+
+  if (cachedAnswer && answer.text === cachedAnswer.answer) {
+    return { answer: cachedAnswer.answer }
+  }
+
+  queueMicrotask(() => {
+    storeFAQ(question, answer.text).catch(err =>
+      console.error('Failed to store FAQ in cache:', err)
+    )
+  })
+
   return { answer: answer.text }
 }
