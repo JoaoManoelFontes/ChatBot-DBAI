@@ -19,7 +19,7 @@ This is a simple chatbot that can answer questions about the database project us
 - [x] Chatbot ai that answers questions about the database project
 - [x] API to get dbai responses
 - [x] Redis cache to store the chatbot responses
-- [x] Retrieval cache with vector similarity search 
+- [x] Retrieval cache with vector similarity search
 
 ### Usage
 
