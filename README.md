@@ -14,11 +14,12 @@ This is a simple chatbot that can answer questions about the database project us
 
 ### Features
 
-[x] Dockerized PostgreSQL and Redis databases
-[x] AI model to create SQL queries based on the questions
-[x] Chatbot ai that answers questions about the database project
-[x] API to get dbai responses
-[] Redis cache to store the chatbot responses
+- [x] Dockerized PostgreSQL and Redis databases
+- [x] AI model to create SQL queries based on the questions
+- [x] Chatbot ai that answers questions about the database project
+- [x] API to get dbai responses
+- [x] Redis cache to store the chatbot responses
+- [x] Retrieval cache with vector similarity search 
 
 ### Usage
 
